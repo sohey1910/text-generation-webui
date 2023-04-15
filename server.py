@@ -35,9 +35,12 @@ if settings_file is not None:
 
 
 def get_available_models():
+    print(f"get_available_models:{get_available_models}")
     if shared.args.flexgen:
         return sorted([re.sub('-np$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if item.name.endswith('-np')], key=str.lower)
     else:
+        print(f"get_available_models ret1:{[item.name for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if not item.name.endswith(('.txt', '-np', '.pt', '.json'))]}")
+        print(f"get_avaliable_models ret2:{sorted([re.sub('.pth$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if not item.name.endswith(('.txt', '-np', '.pt', '.json'))], key=str.lower)}")
         return sorted([re.sub('.pth$', '', item.name) for item in list(Path(f'{shared.args.model_dir}/').glob('*')) if not item.name.endswith(('.txt', '-np', '.pt', '.json'))], key=str.lower)
 
 
@@ -269,8 +272,19 @@ available_characters = get_available_characters()
 available_softprompts = get_available_softprompts()
 available_loras = get_available_loras()
 
+print(f"available_models:{available_models}")
+print(f"available_presets:{available_presets}")
+print(f"available_characters:{available_characters}")
+print(f"available_softprompts:{available_softprompts}")
+print(f"available_loras:{available_loras}")
+
 # Default extensions
 extensions_module.available_extensions = get_available_extensions()
+
+print(f"extensions_module.available_extensions:{extensions_module.available_extensions}")
+
+print(f"shared.is_chat:{shared.is_chat()}")
+
 if shared.is_chat():
     for extension in shared.settings['chat_default_extensions']:
         shared.args.extensions = shared.args.extensions or []
@@ -299,7 +313,13 @@ else:
         i = int(input()) - 1
         print()
     shared.model_name = available_models[i]
+
+print(f"shared.model_name:{shared.model_name}")
+
 shared.model, shared.tokenizer = load_model(shared.model_name)
+
+print(f"shared.args.lora:{shared.args.lora}")
+
 if shared.args.lora:
     add_lora_to_model(shared.args.lora)
 
@@ -310,7 +330,7 @@ if shared.lora_name != "None":
 else:
     default_text = load_prompt(shared.settings['prompts'][next((k for k in shared.settings['prompts'] if re.match(k.lower(), shared.model_name.lower())), 'default')])
 title = 'Text generation web UI'
-
+print(f"default_text:{default_text}")
 
 def create_interface():
     gen_events = []
