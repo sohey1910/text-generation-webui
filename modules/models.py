@@ -98,7 +98,7 @@ def load_model(model_name):
     # Quantized model
     elif shared.args.wbits > 0:
         from modules.GPTQ_loader import load_quantized
-
+        print(f"----------------model_name:{model_name}")
         model = load_quantized(model_name)
 
     # llamacpp model
@@ -173,6 +173,7 @@ def load_model(model_name):
     if any((k in shared.model_name.lower() for k in ['gpt4chan', 'gpt-4chan'])) and Path(f"{shared.args.model_dir}/gpt-j-6B/").exists():
         tokenizer = AutoTokenizer.from_pretrained(Path(f"{shared.args.model_dir}/gpt-j-6B/"))
     elif type(model) is transformers.LlamaForCausalLM:
+        print(f"type model:{type(model)}")
         tokenizer = LlamaTokenizer.from_pretrained(Path(f"{shared.args.model_dir}/{shared.model_name}/"), clean_up_tokenization_spaces=True)
     else:
         tokenizer = AutoTokenizer.from_pretrained(Path(f"{shared.args.model_dir}/{shared.model_name}/"))
