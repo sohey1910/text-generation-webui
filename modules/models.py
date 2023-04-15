@@ -39,6 +39,7 @@ if shared.args.deepspeed:
 
 def load_model(model_name):
     print(f"Loading {model_name}...")
+    print("~~~~~~~~~~~~")
     t0 = time.time()
 
     shared.is_RWKV = 'rwkv-' in model_name.lower()
