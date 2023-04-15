@@ -117,12 +117,14 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
     original_question = question
     if not shared.is_chat():
         question = apply_extensions(question, 'input')
+        print(f"question:{question}")
     if shared.args.verbose:
         print(f'\n\n{question}\n--------------------\n')
 
     # These models are not part of Hugging Face, so we handle them
     # separately and terminate the function call earlier
     if any((shared.is_RWKV, shared.is_llamacpp)):
+        print(f"is_RWKV:{shared.is_RWKV}  is_llamacpp:{shared.is_llamacpp}")
         for k in ['temperature', 'top_p', 'top_k', 'repetition_penalty']:
             generate_params[k] = generate_state[k]
         generate_params['token_count'] = generate_state['max_new_tokens']
@@ -159,14 +161,18 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
     output = input_ids[0]
 
     cuda = not any((shared.args.cpu, shared.args.deepspeed, shared.args.flexgen))
+    print(f"cuda:{cuda}")
     eos_token_ids = [shared.tokenizer.eos_token_id] if shared.tokenizer.eos_token_id is not None else []
+    print(f"eos_token_ids:{eos_token_ids}")
     if eos_token is not None:
         eos_token_ids.append(int(encode(eos_token)[0][-1]))
+    print(f"eos_token_ids2 :{eos_token_ids}")
     stopping_criteria_list = transformers.StoppingCriteriaList()
+    print(f"stopping_strings :{stopping_strings}")
     if type(stopping_strings) is list and len(stopping_strings) > 0:
         t = [encode(string, 0, add_special_tokens=False) for string in stopping_strings]
         stopping_criteria_list.append(_SentinelTokenStoppingCriteria(sentinel_token_ids=t, starting_idx=len(input_ids[0])))
-
+    print(f"stopping_criteria_list :{stopping_criteria_list}")
     if not shared.args.flexgen:
         for k in ['max_new_tokens', 'do_sample', 'temperature', 'top_p', 'typical_p', 'repetition_penalty', 'encoder_repetition_penalty', 'top_k', 'min_length', 'no_repeat_ngram_size', 'num_beams', 'penalty_alpha', 'length_penalty', 'early_stopping']:
             generate_params[k] = generate_state[k]
@@ -174,12 +180,14 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
         generate_params['stopping_criteria'] = stopping_criteria_list
         if shared.args.no_stream:
             generate_params['min_length'] = 0
+        print(f"generate_params flexgen :{generate_params}")
     else:
         for k in ['max_new_tokens', 'do_sample', 'temperature']:
             generate_params[k] = generate_state[k]
         generate_params['stop'] = generate_state['eos_token_ids'][-1]
         if not shared.args.no_stream:
             generate_params['max_new_tokens'] = 8
+        print(f"generate_params not flexgen :{generate_params}")
 
     if shared.args.no_cache:
         generate_params.update({'use_cache': False})
@@ -192,9 +200,12 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
     else:
         generate_params.update({'inputs': input_ids})
 
+    print(f"generate_params final 1 :{generate_params}")
+
     try:
         # Generate the entire reply at once.
         if shared.args.no_stream:
+            print("shared.args.no_stream---------")
             with torch.no_grad():
                 output = shared.model.generate(**generate_params)[0]
                 if cuda:
@@ -212,7 +223,7 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
         # Stream the reply 1 token at a time.
         # This is based on the trick of using 'stopping_criteria' to create an iterator.
         elif not shared.args.flexgen:
-
+            print("not shared.args.flexgen---------")
             def generate_with_callback(callback=None, **kwargs):
                 kwargs['stopping_criteria'].append(Stream(callback_func=callback))
                 clear_torch_cache()
@@ -240,9 +251,11 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
 
         # Stream the output naively for FlexGen since it doesn't support 'stopping_criteria'
         else:
+            print(f"maybe streaming...")
             for i in range(generate_state['max_new_tokens'] // 8 + 1):
                 clear_torch_cache()
                 with torch.no_grad():
+                    print(f"model generate generate_params:{generate_params}")
                     output = shared.model.generate(**generate_params)[0]
                 if shared.soft_prompt:
                     output = torch.cat((input_ids[0], output[filler_input_ids.shape[1]:]))
@@ -254,6 +267,7 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
 
                 if np.count_nonzero(np.isin(input_ids[0], eos_token_ids)) < np.count_nonzero(np.isin(output, eos_token_ids)):
                     break
+                print(f"reply----->:{reply}")
                 yield formatted_outputs(reply, shared.model_name)
 
                 input_ids = np.reshape(output, (1, output.shape[0]))
