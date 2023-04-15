@@ -243,6 +243,7 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
                     new_tokens = len(output) - len(input_ids[0])
                     reply = decode(output[-new_tokens:])
                     print(f"---- new reply:{reply}")
+                    print('~~~~~~~~~~~~~~')
                     if not shared.is_chat():
                         reply = original_question + apply_extensions(reply, 'output')
 
