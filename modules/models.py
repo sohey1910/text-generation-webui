@@ -173,6 +173,7 @@ def load_model(model_name):
 
     # Loading the tokenizer
     if any((k in shared.model_name.lower() for k in ['gpt4chan', 'gpt-4chan'])) and Path(f"{shared.args.model_dir}/gpt-j-6B/").exists():
+        print(f" tokeninzer :   {shared.model_name.lower()}")
         tokenizer = AutoTokenizer.from_pretrained(Path(f"{shared.args.model_dir}/gpt-j-6B/"))
     elif type(model) is transformers.LlamaForCausalLM:
         print(f"type model:{type(model)}")
