@@ -100,6 +100,8 @@ def extract_message_from_reply(reply, name1, name2, stop_at_newline):
 
 
 def chatbot_wrapper(text, generate_state, name1, name2, context, mode, end_of_turn, regenerate=False):
+    
+    print(f"chatbot_wrapper text:{text}")
     if mode == 'instruct':
         stopping_strings = [f"\n{name1}", f"\n{name2}"]
     else:
@@ -140,6 +142,7 @@ def chatbot_wrapper(text, generate_state, name1, name2, context, mode, end_of_tu
     # Generate
     for i in range(generate_state['chat_generation_attempts']):
         reply = None
+        print(f"desc prompt prompt:{prompt}  cumulative_reply:{cumulative_reply}")
         ii=f"{prompt}{' ' if len(cumulative_reply) > 0 else ''}{cumulative_reply}"
         print(f"generate reply input:{ii}  generate_state:{generate_state}  eos_token:{eos_token}  stopping_strings:{stopping_strings}")
         for reply in generate_reply(ii, generate_state, eos_token=eos_token, stopping_strings=stopping_strings):
