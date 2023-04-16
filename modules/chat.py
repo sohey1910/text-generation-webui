@@ -140,11 +140,14 @@ def chatbot_wrapper(text, generate_state, name1, name2, context, mode, end_of_tu
     # Generate
     for i in range(generate_state['chat_generation_attempts']):
         reply = None
-        for reply in generate_reply(f"{prompt}{' ' if len(cumulative_reply) > 0 else ''}{cumulative_reply}", generate_state, eos_token=eos_token, stopping_strings=stopping_strings):
+        ii=f"{prompt}{' ' if len(cumulative_reply) > 0 else ''}{cumulative_reply}"
+        print(f"generate reply input:{ii}  generate_state:{generate_state}  eos_token:{eos_token}  stopping_strings:{stopping_strings}")
+        for reply in generate_reply(ii, generate_state, eos_token=eos_token, stopping_strings=stopping_strings):
             reply = cumulative_reply + reply
-
+            print(f"origin reply:{reply}")
             # Extracting the reply
             reply, next_character_found = extract_message_from_reply(reply, name1, name2, generate_state['stop_at_newline'])
+            print(f"bew reply:{reply}  next_character_found:{next_character_found}")
             visible_reply = re.sub("(<USER>|<user>|{{user}})", name1_original, reply)
             visible_reply = apply_extensions(visible_reply, "output")
 
