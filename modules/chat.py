@@ -206,7 +206,7 @@ def cai_chatbot_wrapper(text, generate_state, name1, name2, context, mode, end_o
     print(f"cai_chatbot_wrapper  text:{text} generate_state:{generate_state} name1:{name1} name2:{name2} context:{context} mode:{mode}  end_of_turn:{end_of_turn}")
     for history in chatbot_wrapper(text, generate_state, name1, name2, context, mode, end_of_turn):
         ret= chat_html_wrapper(history, name1, name2, mode)
-        print(f"cai_chatbot_wrapper ret:{ret}")
+        # print(f"cai_chatbot_wrapper ret:{ret}")
         yield ret
 
 
