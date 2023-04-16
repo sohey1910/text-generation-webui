@@ -75,11 +75,13 @@ def extract_message_from_reply(reply, name1, name2, stop_at_newline):
         lines = reply.split('\n')
         reply = lines[0].strip()
         if len(lines) > 1:
+            print(f"reply:{reply}  lines:{lines}")
             next_character_found = True
     else:
         for string in [f"\n{name1}:", f"\n{name2}:"]:
             idx = reply.find(string)
             if idx != -1:
+                print(f"reply:{reply}  new_idx:{reply[:idx]}  idx:{idx}")
                 reply = reply[:idx]
                 next_character_found = True
 
