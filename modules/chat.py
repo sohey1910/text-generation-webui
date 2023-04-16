@@ -159,6 +159,7 @@ def chatbot_wrapper(text, generate_state, name1, name2, context, mode, end_of_tu
             # We need this global variable to handle the Stop event,
             # otherwise gradio gets confused
             if shared.stop_everything:
+                print(f"shared.stop_everything:{shared.stop_everything}")
                 return shared.history['visible']
             if just_started:
                 just_started = False
@@ -171,6 +172,7 @@ def chatbot_wrapper(text, generate_state, name1, name2, context, mode, end_of_tu
             if not shared.args.no_stream:
                 yield shared.history['visible']
             if next_character_found:
+                print(f"next_character_found:{next_character_found}")
                 break
 
         if reply is not None:

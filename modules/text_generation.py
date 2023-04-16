@@ -251,6 +251,7 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
                     print(f"output:{output}  eos_token_ids:{eos_token_ids}")
                     print("----->")
                     if output[-1] in eos_token_ids:
+                        print(f"output[-1] in eos_token_ids  :{eos_token_ids}")
                         break
                     yield formatted_outputs(reply, shared.model_name)
 

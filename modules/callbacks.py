@@ -58,6 +58,7 @@ class Iteratorize:
 
         def _callback(val):
             if self.stop_now or shared.stop_everything:
+                print(f"self.stop_now:{self.stop_now}  shared.stop_everything:{shared.stop_everything}")
                 raise ValueError
             self.q.put(val)
 
@@ -65,8 +66,10 @@ class Iteratorize:
             try:
                 ret = self.mfunc(callback=_callback, **self.kwargs)
             except ValueError:
+                print(f"ValueError:{traceback.format_exc()}")
                 pass
             except:
+                print(f"ValueError:{traceback.format_exc()}")
                 traceback.print_exc()
                 pass
 
@@ -84,6 +87,7 @@ class Iteratorize:
     def __next__(self):
         obj = self.q.get(True, None)
         if obj is self.sentinel:
+            print(f"obj self.sentinel:{self.sentinel}  {obj is self.sentinel}")
             raise StopIteration
         else:
             return obj
