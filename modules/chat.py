@@ -165,6 +165,7 @@ def chatbot_wrapper(text, generate_state, name1, name2, context, mode, end_of_tu
 
             shared.history['internal'][-1] = [text, reply]
             shared.history['visible'][-1] = [visible_text, visible_reply]
+            print(f"next_character_found:{next_character_found} ----")
             if not shared.args.no_stream:
                 yield shared.history['visible']
             if next_character_found:
