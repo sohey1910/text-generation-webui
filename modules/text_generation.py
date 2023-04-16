@@ -228,7 +228,7 @@ def generate_reply(question, generate_state, eos_token=None, stopping_strings=[]
                 kwargs['stopping_criteria'].append(Stream(callback_func=callback))
                 clear_torch_cache()
                 with torch.no_grad():
-                    print(f"data to model:{kwargs}")
+                    print(f"---> data to model:{kwargs}")
                     shared.model.generate(**kwargs)
 
             def generate_with_streaming(**kwargs):
